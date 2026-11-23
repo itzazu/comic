@@ -1,2 +1,7 @@
-plugins { id("org.jetbrains.kotlin.jvm") version "2.0.21" }
-kotlin { jvmToolchain(17) }
+plugins {
+    id("org.jetbrains.kotlin.jvm")
+}
+
+kotlin {
+    jvmToolchain(17)
+}
