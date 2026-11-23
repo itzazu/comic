@@ -114,7 +114,7 @@ fun ReaderHome() {
             when (selectedTab) {
                 0 -> KomikuWebView(url, Modifier.fillMaxSize()) { webView = it }
                 1 -> DownloadCenter()
-                else -> Text("Pengaturan aplikasi", modifier = Modifier.align(Alignment.Center))
+                else -> ExtensionManagerPanel(Modifier.fillMaxSize())
             }
             if (!showToolbar && selectedTab == 0) {
                 TextButton(onClick = { showToolbar = true }, modifier = Modifier.align(Alignment.TopEnd)) {

@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "Komiku Reader Example",
+  "version": "1.0.0",
+  "description": "Contoh extension content script untuk menguji proses import.",
+  "content_scripts": [
+    {
+      "matches": ["https://komiku.org/*", "https://www.komiku.org/*"],
+      "js": ["content.js"]
+    }
+  ]
+}

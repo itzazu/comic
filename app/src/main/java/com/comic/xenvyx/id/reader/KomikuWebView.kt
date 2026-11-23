@@ -9,11 +9,10 @@ import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import com.comic.xenvyx.id.extension.ExtensionManager
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
-
-private val allowedHosts = setOf("komiku.org", "www.komiku.org")
 
 @SuppressLint("SetJavaScriptEnabled")
 private fun createReaderWebView(context: Context): WebView = WebView(context).apply {
@@ -30,7 +29,18 @@ private fun createReaderWebView(context: Context): WebView = WebView(context).ap
     webViewClient = object : WebViewClient() {
         override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
             val uri: Uri = request.url
-            return uri.scheme != "https" || uri.host?.lowercase() !in allowedHosts
+            // Browser-style navigation: allow HTTPS sites only. Local files and cleartext HTTP stay blocked.
+            return uri.scheme != "https"
+        }
+        override fun onPageFinished(view: WebView, url: String?) {
+            super.onPageFinished(view, url)
+            val pageUrl = url ?: return
+            // Scripts are installed locally, start disabled, and run only for their declared HTTPS URL matches.
+            val scripts = runCatching { ExtensionManager(view.context).scriptsFor(pageUrl) }.getOrDefault(emptyList())
+            scripts.forEach { script ->
+                val quoted = org.json.JSONObject.quote(script)
+                view.evaluateJavascript("(function(){try{(new Function($quoted))();}catch(e){console.error('Komiku extension error',e);}})();", null)
+            }
         }
         override fun onPageStarted(view: WebView, url: String?, favicon: Bitmap?) { super.onPageStarted(view, url, favicon) }
     }
